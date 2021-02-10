@@ -59,6 +59,17 @@ static void zoom(const Arg *);
 static void zoomabs(const Arg *);
 static void zoomreset(const Arg *);
 static void ttysend(const Arg *);
+static void borderpxsetx(const Arg *); /* xypadding */
+static void borderpxsety(const Arg *); /* xypadding */
+static void borderpxsetxy(const Arg *); /* xypadding */
+static void borderpxmodx(const Arg *); /* xypadding */
+static void borderpxmody(const Arg *); /* xypadding */
+static void borderpxmodxy(const Arg *); /* xypadding */
+static void borderpxsquarex(const Arg *); /* xypadding */
+static void borderpxsquarey(const Arg *); /* xypadding */
+static void borderpxresetx(const Arg *); /* xypadding */
+static void borderpxresety(const Arg *); /* xypadding */
+static void borderpxreset(const Arg *); /* xypadding */
 
 /* config.h for applying patches and the configuration. */
 #include "config.h"
@@ -243,6 +254,15 @@ static char *usedfont = NULL;
 static double usedfontsize = 0;
 static double defaultfontsize = 0;
 
+/* xypadding */
+#define BORDERPXX_MAX 1024
+/* xypadding */
+#define BORDERPXY_MAX 1024
+
+static int  def_borderpxx = 0; /* xypadding */
+static int  def_borderpxy = 0; /* xypadding */
+static char *opt_borderpxx = NULL; /* xypadding */
+static char *opt_borderpxy = NULL; /* xypadding */
 static char *opt_class = NULL;
 static char **opt_cmd  = NULL;
 static char *opt_embed = NULL;
@@ -328,10 +348,112 @@ ttysend(const Arg *arg)
 	ttywrite(arg->s, strlen(arg->s), 1);
 }
 
+/* xypadding */
+void
+borderpxsetx(const Arg *arg)
+{
+	borderpxx = arg->i;
+	cresize(0, 0);
+	redraw();
+}
+
+/* xypadding */
+void
+borderpxsety(const Arg *arg)
+{
+	borderpxy = arg->i;
+	cresize(0, 0);
+	redraw();
+}
+
+/* xypadding */
+void
+borderpxsetxy(const Arg *arg)
+{
+	borderpxx = arg->i;
+	borderpxy = arg->i;
+	cresize(0, 0);
+	redraw();
+}
+
+/* xypadding */
+void
+borderpxmodx(const Arg *arg)
+{
+	borderpxx += arg->i;
+	cresize(0, 0);
+	redraw();
+}
+
+/* xypadding */
+void
+borderpxmody(const Arg *arg)
+{
+	borderpxy += arg->i;
+	cresize(0, 0);
+	redraw();
+}
+
+/* xypadding */
+void
+borderpxmodxy(const Arg *arg)
+{
+	borderpxx += arg->i;
+	borderpxy += arg->i;
+	cresize(0, 0);
+	redraw();
+}
+
+/* xypadding */
+void
+borderpxsquarex(const Arg *arg)
+{
+	 borderpxx = borderpxy;
+	 cresize(0, 0);
+	 redraw();
+}
+
+/* xypadding */
+void
+borderpxsquarey(const Arg *arg)
+{
+	 borderpxy = borderpxx;
+	 cresize(0, 0);
+	 redraw();
+}
+
+/* xypadding */
+void
+borderpxresetx(const Arg *arg)
+{
+	 borderpxx = def_borderpxx;
+	 cresize(0, 0);
+	 redraw();
+}
+
+/* xypadding */
+void
+borderpxresety(const Arg *arg)
+{
+	 borderpxy = def_borderpxy;
+	 cresize(0, 0);
+	 redraw();
+}
+
+/* xypadding */
+void
+borderpxreset(const Arg *arg)
+{
+	 borderpxx = def_borderpxx;
+	 borderpxy = def_borderpxy;
+	 cresize(0, 0);
+	 redraw();
+}
+
 int
 evcol(XEvent *e)
 {
-	int x = e->xbutton.x - borderpx;
+	int x = e->xbutton.x - borderpxx; /* xypadding */
 	LIMIT(x, 0, win.tw - 1);
 	return x / win.cw;
 }
@@ -339,7 +461,7 @@ evcol(XEvent *e)
 int
 evrow(XEvent *e)
 {
-	int y = e->xbutton.y - borderpx;
+	int y = e->xbutton.y - borderpxy; /* xypadding */
 	LIMIT(y, 0, win.th - 1);
 	return y / win.ch;
 }
@@ -716,8 +838,8 @@ cresize(int width, int height)
 	if (height != 0)
 		win.h = height;
 
-	col = (win.w - 2 * borderpx) / win.cw;
-	row = (win.h - 2 * borderpx) / win.ch;
+	col = (win.w - 2 * borderpxx) / win.cw; /* xypadding */
+	row = (win.h - 2 * borderpxy) / win.ch; /* xypadding */
 	col = MAX(1, col);
 	row = MAX(1, row);
 
@@ -840,10 +962,10 @@ xhints(void)
 	sizeh->width = win.w;
 	sizeh->height_inc = win.ch;
 	sizeh->width_inc = win.cw;
-	sizeh->base_height = 2 * borderpx;
-	sizeh->base_width = 2 * borderpx;
-	sizeh->min_height = win.ch + 2 * borderpx;
-	sizeh->min_width = win.cw + 2 * borderpx;
+	sizeh->base_height = 2 * borderpxy; /* xypadding */
+	sizeh->base_width = 2 * borderpxx; /* xypadding */
+	sizeh->min_height = win.ch + 2 * borderpxy; /* xypadding */
+	sizeh->min_width = win.cw + 2 * borderpxx; /* xypadding */
 	if (xw.isfixed) {
 		sizeh->flags |= PMaxSize;
 		sizeh->min_width = sizeh->max_width = win.w;
@@ -1104,6 +1226,14 @@ xinit(int cols, int rows)
 	pid_t thispid = getpid();
 	XColor xmousefg, xmousebg;
 
+	if (opt_borderpxx) /* xypadding */
+		borderpxx = (int)strtof(opt_borderpxx, NULL);
+	if (opt_borderpxy) /* xypadding */
+		borderpxy = (int)strtof(opt_borderpxy, NULL);
+
+	def_borderpxx = borderpxx; /* xypadding */
+	def_borderpxy = borderpxy; /* xypadding */
+
 	if (!(xw.dpy = XOpenDisplay(NULL)))
 		die("can't open display\n");
 	xw.scr = XDefaultScreen(xw.dpy);
@@ -1121,8 +1251,8 @@ xinit(int cols, int rows)
 	xloadcols();
 
 	/* adjust fixed window geometry */
-	win.w = 2 * borderpx + cols * win.cw;
-	win.h = 2 * borderpx + rows * win.ch;
+	win.w = cols * win.cw; /* xypadding */
+	win.h = rows * win.ch; /* xypadding */
 	if (xw.gm & XNegative)
 		xw.l += DisplayWidth(xw.dpy, xw.scr) - win.w - 2;
 	if (xw.gm & YNegative)
@@ -1211,7 +1341,7 @@ xinit(int cols, int rows)
 int
 xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x, int y)
 {
-	float winx = borderpx + x * win.cw, winy = borderpx + y * win.ch, xp, yp;
+	float winx = borderpxx + x * win.cw, winy = borderpxy + y * win.ch, xp, yp; /* xypadding */
 	ushort mode, prevmode = USHRT_MAX;
 	Font *font = &dc.font;
 	int frcflags = FRC_NORMAL;
@@ -1344,7 +1474,7 @@ void
 xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, int y)
 {
 	int charlen = len * ((base.mode & ATTR_WIDE) ? 2 : 1);
-	int winx = borderpx + x * win.cw, winy = borderpx + y * win.ch,
+	int winx = borderpxx + x * win.cw, winy = borderpxy + y * win.ch, /* xypadding */
 	    width = charlen * win.cw;
 	Color *fg, *bg, *temp, revfg, revbg, truefg, truebg;
 	XRenderColor colfg, colbg;
@@ -1434,17 +1564,17 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
 
 	/* Intelligent cleaning up of the borders. */
 	if (x == 0) {
-		xclear(0, (y == 0)? 0 : winy, borderpx,
+		xclear(0, (y == 0)? 0 : winy, borderpxx, /* xypadding */
 			winy + win.ch +
-			((winy + win.ch >= borderpx + win.th)? win.h : 0));
+			((winy + win.ch >= borderpxx + win.th)? win.h : 0)); /* xypadding */
 	}
-	if (winx + width >= borderpx + win.tw) {
+	if (winx + width >= borderpxx + win.tw) { /* xypadding */
 		xclear(winx + width, (y == 0)? 0 : winy, win.w,
-			((winy + win.ch >= borderpx + win.th)? win.h : (winy + win.ch)));
+			((winy + win.ch >= borderpxx + win.th)? win.h : (winy + win.ch))); /* xypadding */
 	}
 	if (y == 0)
-		xclear(winx, 0, winx + width, borderpx);
-	if (winy + win.ch >= borderpx + win.th)
+		xclear(winx, 0, winx + width, borderpxy); /* xypadding */
+	if (winy + win.ch >= borderpxy + win.th) /* xypadding */
 		xclear(winx, winy + win.ch, winx + width, win.h);
 
 	/* Clean up the region we want to draw to. */
@@ -1538,35 +1668,35 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
 		case 3: /* Blinking Underline */
 		case 4: /* Steady Underline */
 			XftDrawRect(xw.draw, &drawcol,
-					borderpx + cx * win.cw,
-					borderpx + (cy + 1) * win.ch - \
-						cursorthickness,
+					borderpxx + cx * win.cw, /* xypadding */
+					borderpxy + (cy + 1) * win.ch - \
+						cursorthickness, /* xypadding */
 					win.cw, cursorthickness);
 			break;
 		case 5: /* Blinking bar */
 		case 6: /* Steady bar */
 			XftDrawRect(xw.draw, &drawcol,
-					borderpx + cx * win.cw,
-					borderpx + cy * win.ch,
+					borderpxx + cx * win.cw, /* xypadding */
+					borderpxy + cy * win.ch, /* xypadding */
 					cursorthickness, win.ch);
 			break;
 		}
 	} else {
 		XftDrawRect(xw.draw, &drawcol,
-				borderpx + cx * win.cw,
-				borderpx + cy * win.ch,
+				borderpxx + cx * win.cw, /* xypadding */
+				borderpxy + cy * win.ch, /* xypadding */
 				win.cw - 1, 1);
 		XftDrawRect(xw.draw, &drawcol,
-				borderpx + cx * win.cw,
-				borderpx + cy * win.ch,
+				borderpxx + cx * win.cw, /* xypadding */
+				borderpxy + cy * win.ch, /* xypadding */
 				1, win.ch - 1);
 		XftDrawRect(xw.draw, &drawcol,
-				borderpx + (cx + 1) * win.cw - 1,
-				borderpx + cy * win.ch,
+				borderpxx + (cx + 1) * win.cw - 1, /* xypadding */
+				borderpxy + cy * win.ch, /* xypadding */
 				1, win.ch - 1);
 		XftDrawRect(xw.draw, &drawcol,
-				borderpx + cx * win.cw,
-				borderpx + (cy + 1) * win.ch - 1,
+				borderpxx + cx * win.cw, /* xypadding */
+				borderpxy + (cy + 1) * win.ch - 1, /* xypadding */
 				win.cw, 1);
 	}
 }
@@ -1659,8 +1789,8 @@ xximspot(int x, int y)
 	if (xw.ime.xic == NULL)
 		return;
 
-	xw.ime.spot.x = borderpx + x * win.cw;
-	xw.ime.spot.y = borderpx + (y + 1) * win.ch;
+	xw.ime.spot.x = borderpxx + x * win.cw; /* xypadding */
+	xw.ime.spot.y = borderpxy + (y + 1) * win.ch; /* xypadding */
 
 	XSetICValues(xw.ime.xic, XNPreeditAttributes, xw.ime.spotlist, NULL);
 }
@@ -2031,6 +2161,12 @@ main(int argc, char *argv[])
 	case 't':
 	case 'T':
 		opt_title = EARGF(usage());
+		break;
+	case 'X': /* xypadding */
+		opt_borderpxx = EARGF(usage());
+		break;
+	case 'Y': /* xypadding */
+		opt_borderpxy = EARGF(usage());
 		break;
 	case 'w':
 		opt_embed = EARGF(usage());

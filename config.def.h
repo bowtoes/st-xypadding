@@ -6,7 +6,8 @@
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
 static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
-static int borderpx = 2;
+static int borderpxx = 30; /* xypadding */
+static int borderpxy = 60; /* xypadding */
 
 /*
  * What program is execed by st depends of these precedence rules:
@@ -194,6 +195,20 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
 	{ TERMMOD,              XK_Next,        zoom,           {.f = -1} },
 	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
+	{ ControlMask,          XK_Home,        borderpxsetx,   {.i =  0} }, /* xypadding */
+	{ ShiftMask,            XK_Home,        borderpxsety,   {.i =  0} }, /* xypadding */
+	{ MODKEY|TERMMOD,       XK_Home,        borderpxsetxy,  {.i =  0} }, /* xypadding */
+	{ ControlMask,          XK_Page_Up,     borderpxmodx,   {.i = +1} }, /* xypadding */
+	{ ControlMask,          XK_Page_Down,   borderpxmodx,   {.i = -1} }, /* xypadding */
+	{ ShiftMask,            XK_Page_Up,     borderpxmody,   {.i = +1} }, /* xypadding */
+	{ ShiftMask,            XK_Page_Down,   borderpxmody,   {.i = -1} }, /* xypadding */
+	{ MODKEY|TERMMOD,       XK_Page_Up,     borderpxmodxy,  {.i = +1} }, /* xypadding */
+	{ MODKEY|TERMMOD,       XK_Page_Down,   borderpxmodxy,  {.i = -1} }, /* xypadding */
+	{ ControlMask,          XK_End,         borderpxsquarex,{.i =  0} }, /* xypadding */
+	{ ShiftMask,            XK_End,         borderpxsquarey,{.i =  0} }, /* xypadding */
+	{ ControlMask,          XK_Delete,      borderpxresetx, {.i =  0} }, /* xypadding */
+	{ ShiftMask,            XK_Delete,      borderpxresety, {.i =  0} }, /* xypadding */
+	{ MODKEY|TERMMOD,       XK_Delete,      borderpxreset,  {.i =  0} }, /* xypadding */
 	{ TERMMOD,              XK_C,           clipcopy,       {.i =  0} },
 	{ TERMMOD,              XK_V,           clippaste,      {.i =  0} },
 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
